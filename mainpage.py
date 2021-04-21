@@ -11,6 +11,11 @@ PAGES = {
 
 }
 
+st.set_page_config(
+    page_title="Psycovid-Team",  # => Quick reference - Streamlit
+    # page_icon="",
+    layout="centered",  # wide
+    initial_sidebar_state="auto")  # collapsed
 
 def edu_func(X):
 
