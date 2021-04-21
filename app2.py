@@ -15,6 +15,9 @@ def app():
 
     st.sidebar.title('Visualisation Selector')
 
+    # Comment/UNCOMMENT THOSE LINES TO ACTIVTE GCP PATH
+    
+    # client = storage.Client()
     path = f"gs://{BUCKET_NAME}/{BUCKET_TRAIN_DATA_PATH}"
     
     @st.cache
@@ -22,6 +25,8 @@ def app():
         return pd.read_csv(path).drop(columns='Unnamed: 0')
     
     df = get_cached_data() 
+    # df = pd.read_csv(
+    #     'raw_data/cleaned_data_040321.csv').drop(columns='Unnamed: 0')
 
 
     #select = st.sidebar.selectbox('Select a State',df['state'])
@@ -72,22 +77,17 @@ def app():
         return fig
 
 
-    st.plotly_chart(country_stats())
-
-
     def stress():
 
         fig = plt.figure()
 
-        items = []
-        for i in user_select:
-            items.append(i)
-        length = len(items)
-        if length <= 3:
-            sns.histplot(df[df['Country'].isin(items[0:3])],
-                         x="PSS10_avg", hue="Country")
-            plt.xlabel('Perceived Stress', size=10)
-            plt.ylabel('Number of people', size=10)
+        for i in items:
+            sns.kdeplot(data=df[df['Country'] == i],
+                        x="PSS10_avg", common_norm=False, label=i)
+        # plt.title('STRESS', fontsize=15)
+        plt.xlabel('Perceived Stress', size=15)
+        plt.ylabel('Percentage of people', size=15)
+        plt.legend()
 
         return fig
 
@@ -96,23 +96,38 @@ def app():
 
         fig = plt.figure()
 
-        items = []
+        
         for i in user_select:
             items.append(i)
-        length = len(items)
-        if length <= 3:
-            sns.histplot(df[df['Country'].isin(items[0:3])],
-                        x="SLON3_avg", hue="Country")
-            plt.xlabel('Loneliness', size=10)
-            plt.ylabel('Number of people', size=10)
+        
+            sns.kdeplot(data=df[df['Country'] == i],
+                        x="SLON3_avg", common_norm=False, label=i)
+            # plt.title('LONLINESS', fontsize=15)
+            plt.xlabel('Percived Loneliness', size=15)
+            plt.ylabel('Percentage of people', size=15)
+            plt.legend()
 
         return fig
 
+    # Create Columns
+    # col1, col2 = st.beta_columns(2)
 
-    stress_radio = st.sidebar.radio(
-        '...and the topic', ('Perceived Stress', 'Loneliness'))
-    if stress_radio == 'Perceived Stress':
-        st.write(stress())
-
-    elif stress_radio == 'Loneliness':
-        st.write(loneliness())
+    items = []
+    for i in user_select:
+        items.append(i)
+    if st.sidebar.button('Apply'):
+        # print is visible in server output, not in the page
+        print('button clicked!')
+        st.plotly_chart(country_stats(), use_container_width=False)
+        col1, col2 = st.beta_columns(2)
+        col1.markdown('''### Stress''', unsafe_allow_html=True)
+        col1.write(stress(), use_column_width=True)
+        col2.markdown('''### Loneliness''', unsafe_allow_html=True)
+        col2.write(loneliness(), use_column_width=True)
+        items = []
+    else:
+        st.sidebar.write('Press to apply')
+        st.title('Please, select countries to compare')
+        st.header('...and press Apply')
+    
+    
