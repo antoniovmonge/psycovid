@@ -4,7 +4,7 @@
 raw_data/
 **/__pycache__/
 .env
-notebooks
+notebooks/
 
 # OS generated files #
 ######################

@@ -7,7 +7,7 @@ PAGES = {
     "Introduction": intro,
     "Predictions": app1,
     "Data Analysis": app2,
-    " Project Architecture": archi
+    "Project Architecture": archi
 
 }
 
